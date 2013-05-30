@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,6 +50,12 @@
   <ItemGroup>
     <Compile Include="BHO.cs" />
     <Compile Include="DBConnector.cs" />
+    <Compile Include="Reporter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reporter.Designer.cs">
+      <DependentUpon>Reporter.cs</DependentUpon>
+    </Compile>
     <Compile Include="IObjectWithSite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -74,6 +81,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="asdf.snk" />
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Reporter.resx">
+      <DependentUpon>Reporter.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

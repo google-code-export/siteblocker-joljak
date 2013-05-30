@@ -21,7 +21,7 @@ namespace BHO테스트1
     public class BHO : IObjectWithSite
     {
         private WebBrowser webBrowser;
-
+        private String BeforeURL = "";
         public int SetSite(object site)
         {
             if (site != null)
@@ -92,16 +92,35 @@ namespace BHO테스트1
             SHDocVw.WebBrowser browser = (SHDocVw.WebBrowser)pDisp;
             string url = URL.ToString();
 
-            // Grab the document object off of the Web Browser control
-            IHTMLDocument2 document = (IHTMLDocument2)webBrowser.Document;
-            if (document == null) return;
-
-            if (URL.ToString().Equals("http://www.danawa.com/"))
+            if (!BeforeURL.Equals(url))
             {
-                int rating = DBConnector.GetUrlRating(url);
-                System.Windows.Forms.MessageBox.Show(rating.ToString());
-            }
+                BeforeURL = url;
+                // Grab the document object off of the Web Browser control
+                IHTMLDocument2 document = (IHTMLDocument2)webBrowser.Document;
+                if (document == null) return;
 
+                int rating = DBConnector.GetUrlRating(url);
+
+                if (rating <= 0)
+                {
+                    // This is Safe Site.
+                }
+                else if (rating >= 1 && rating <= 25)
+                {
+                    // This is Reported Site. But Not Blocked Site
+                    System.Windows.Forms.MessageBox.Show("Reported");
+                }
+                else if (rating >= 26 && rating <= 75)
+                {
+                    // This is Reported Site.
+                    System.Windows.Forms.MessageBox.Show("Danger. But Accessable");
+                }
+                else if (rating >= 76 && rating <= 100)
+                {
+                    // This is Reported Site.
+                    System.Windows.Forms.MessageBox.Show("Danger. Blocked");
+                }
+            }
             // Pass the current URL to the broker
             PassUrlToBroker(url);
         }
@@ -125,7 +144,7 @@ namespace BHO테스트1
                     );
 
                 // Attempt a connection with a 2 second limit
-                pipeClient.Connect(1);
+                pipeClient.Connect(0);
 
                 //
                 pipeClient.ReadMode = PipeTransmissionMode.Message;
