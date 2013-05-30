@@ -17,10 +17,10 @@ namespace BHO테스트1
          *  점수 가져오기 : GetUrlRating("문자열 형식의 URL);
          *  신고하기 : ReportSite("문자열 형식의 URL","문자열 형식의 이메일");
          */
-        const string URL_GET = "http://siteblocker.cloudapp.net/db_get.php";
-        const string URL_PUT = "http://siteblocker.cloudapp.net/db_put.php";
+        const string URL_GET = "http://siteblocker.iptime.org/db_get.php";
+        const string URL_PUT = "http://siteblocker.iptime.org/db_put.php";
 
-        static int GetUrlRating(String Url)
+        public static int GetUrlRating(String Url)
         /*
          * 해당 URL의 신고 점수를 받아옴 다른건 가져올 필요가 없을 것 같아서 뺌
          */
@@ -60,7 +60,7 @@ namespace BHO테스트1
                 return -1;
             }
         }
-        static Boolean ReportSite(String Url, String Reporter_email)
+        public static Boolean ReportSite(String Url, String Reporter_email)
         {
             HttpWebRequest wReq;
             Stream PostDataStream;
