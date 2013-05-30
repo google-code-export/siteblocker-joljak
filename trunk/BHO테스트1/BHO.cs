@@ -8,31 +8,11 @@ using mshtml;
 using System.IO;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
-
-
+using System.Security.Permissions;
+using System.IO.Pipes;
 
 namespace BHO테스트1
 {
-    public class Class1
-    {
-    }
-
-
-    [
-        ComVisible(true),
-        InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-        Guid("FC4801A3-2BA9-11CF-A229-00AA003D7352")
-    ]
-    public interface IObjectWithSite
-    {
-        [PreserveSig]
-        int SetSite([MarshalAs(UnmanagedType.IUnknown)]object site);
-        [PreserveSig]
-        int GetSite(ref Guid guid, out IntPtr ppvSite);
-    }
-
-
-
     [
             ComVisible(true),
             Guid("2159CB25-EF9A-54C1-B43C-E30D1A4A8277"),
@@ -47,15 +27,17 @@ namespace BHO테스트1
             if (site != null)
             {
                 webBrowser = (WebBrowser)site;
-                webBrowser.DocumentComplete +=
+                /*webBrowser.DocumentComplete +=
                   new DWebBrowserEvents2_DocumentCompleteEventHandler(
-                  this.OnDocumentComplete);
+                  this.OnDocumentComplete);*/
+                webBrowser.NavigateComplete2 += new DWebBrowserEvents2_NavigateComplete2EventHandler(this.webBrowser_NavigateComplete2);
             }
             else
             {
-                webBrowser.DocumentComplete -=
+                /*webBrowser.DocumentComplete -=
                   new DWebBrowserEvents2_DocumentCompleteEventHandler(
-                  this.OnDocumentComplete);
+                  this.OnDocumentComplete);*/
+                webBrowser.NavigateComplete2 += new DWebBrowserEvents2_NavigateComplete2EventHandler(this.webBrowser_NavigateComplete2);
                 webBrowser = null;
             }
 
@@ -70,9 +52,9 @@ namespace BHO테스트1
             Marshal.Release(punk);
             return hr;
         }
-        
 
-     
+
+
         public void OnDocumentComplete(object pDisp, ref object URL)
         {
             HTMLDocument document = (HTMLDocument)webBrowser.Document;
@@ -87,7 +69,7 @@ namespace BHO테스트1
             scriptObject.type = @"text/javascript";
             scriptObject.text = "alert('aaa');";
             ((HTMLHeadElement)head).appendChild((IHTMLDOMNode)scriptObject);
-  
+
             /*
             // If the site or url is null, do not continue
             if (pDisp == null || URL == null) return;
@@ -100,8 +82,73 @@ namespace BHO테스트1
              */
         }
 
+        void webBrowser_NavigateComplete2(object pDisp, ref object URL)
+        {
+            // If the site or url is null, do not continue
+            if (pDisp == null || URL == null) return;
 
+            // Access both the web browser object and the url passed
+            // to this event handler
+            SHDocVw.WebBrowser browser = (SHDocVw.WebBrowser)pDisp;
+            string url = URL.ToString();
 
+            // Grab the document object off of the Web Browser control
+            IHTMLDocument2 document = (IHTMLDocument2)webBrowser.Document;
+            if (document == null) return;
+
+            if (URL.ToString().Equals("http://www.danawa.com/"))
+            {
+                int rating = DBConnector.GetUrlRating(url);
+                System.Windows.Forms.MessageBox.Show(rating.ToString());
+            }
+
+            // Pass the current URL to the broker
+            PassUrlToBroker(url);
+        }
+
+        public void PassUrlToBroker(string url)
+        {
+            // Create a new named pipe client object
+            NamedPipeClientStream pipeClient = null;
+
+            try
+            {
+
+                // Grab a new instance of a named pipe cleint
+                // stream, connecting to the same named pipe as the
+                // server- BhoPipeName
+                pipeClient = new NamedPipeClientStream(
+                    ".",
+                    "BhoPipeExample",
+                    PipeDirection.InOut,
+                    PipeOptions.None
+                    );
+
+                // Attempt a connection with a 2 second limit
+                pipeClient.Connect(1);
+
+                //
+                pipeClient.ReadMode = PipeTransmissionMode.Message;
+
+                // Once connected, pass the url to the server
+                pipeClient.Write(Encoding.Unicode.GetBytes(url), 0,
+                    Encoding.Unicode.GetBytes(url).Length);
+
+                // Wait for the message to complete
+                while (!pipeClient.IsMessageComplete) ;
+
+            }
+            catch (Exception) { }
+            finally
+            {
+                // Close the pipe client once complete (if exists)
+                if (pipeClient != null)
+                {
+                    pipeClient.Close();
+                    pipeClient = null;
+                }
+            }
+        }
 
 
 
@@ -142,10 +189,6 @@ namespace BHO테스트1
 
             if (registryKey != null)
                 registryKey.DeleteSubKey(guid, false);
-        }  
+        }
     }
-
-
-
-
 }
