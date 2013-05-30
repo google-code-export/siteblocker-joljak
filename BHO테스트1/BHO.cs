@@ -62,13 +62,13 @@ namespace BHO테스트1
 
             //HTMLDocument document = (HTMLDocument)webBrowser.Document;
 
-            IHTMLElement head = (IHTMLElement)((IHTMLElementCollection)
+            /*IHTMLElement head = (IHTMLElement)((IHTMLElementCollection)
                                    document.all.tags("head")).item(null, 0);
             IHTMLScriptElement scriptObject =
               (IHTMLScriptElement)document.createElement("script");
             scriptObject.type = @"text/javascript";
             scriptObject.text = "alert('aaa');";
-            ((HTMLHeadElement)head).appendChild((IHTMLDOMNode)scriptObject);
+            ((HTMLHeadElement)head).appendChild((IHTMLDOMNode)scriptObject);*/
 
             /*
             // If the site or url is null, do not continue
@@ -86,7 +86,7 @@ namespace BHO테스트1
         {
             // If the site or url is null, do not continue
             if (pDisp == null || URL == null) return;
-
+            
             // Access both the web browser object and the url passed
             // to this event handler
             SHDocVw.WebBrowser browser = (SHDocVw.WebBrowser)pDisp;
@@ -104,25 +104,33 @@ namespace BHO테스트1
                 if (rating <= 0)
                 {
                     // This is Safe Site.
+                    // Pass the current URL to the broker
+                    PassUrlToBroker(url);
                 }
                 else if (rating >= 1 && rating <= 25)
                 {
                     // This is Reported Site. But Not Blocked Site
                     System.Windows.Forms.MessageBox.Show("Reported");
+                    // Pass the current URL to the broker
+                    PassUrlToBroker(url);
                 }
                 else if (rating >= 26 && rating <= 75)
                 {
                     // This is Reported Site.
                     System.Windows.Forms.MessageBox.Show("Danger. But Accessable");
+                    // Pass the current URL to the broker
+                    PassUrlToBroker(url);
                 }
                 else if (rating >= 76 && rating <= 100)
                 {
                     // This is Reported Site.
                     System.Windows.Forms.MessageBox.Show("Danger. Blocked");
+                    browser.Stop();
+                    document.clear();
+                    document.close();
+                    browser.Navigate2("about:blank", true);
                 }
             }
-            // Pass the current URL to the broker
-            PassUrlToBroker(url);
         }
 
         public void PassUrlToBroker(string url)
