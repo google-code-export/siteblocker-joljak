@@ -7,7 +7,7 @@ using System.IO;
 
 namespace BHO테스트1
 {
-    class DBConnector
+    public class DBConnector
     {
         /*
          * 데이터베이스에 접근할 PHP 페이지의 URL
