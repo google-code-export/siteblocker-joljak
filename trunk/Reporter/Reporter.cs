@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using BHO테스트1;
+using Site_Blocker;
 
 namespace Reporter
 {
