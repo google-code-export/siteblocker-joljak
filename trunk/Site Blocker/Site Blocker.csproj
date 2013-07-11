@@ -50,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BHO.cs" />
+    <Compile Include="CustomUIControls.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DBConnector.cs" />
     <Compile Include="Reporter.cs">
       <SubType>Form</SubType>
@@ -101,6 +104,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="close.bmp" />
+    <Content Include="popup.bmp" />
     <Content Include="Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
