@@ -24,11 +24,11 @@ namespace Site_Blocker
         const string URL_PUT = "http://siteblocker.iptime.org/db_put.php";
 
         static Thread T1, T2;
-        static Boolean T1_Start, T2_Start;
+        static Boolean T1_Start = false, T2_Start = false;
         static int DBScore; //데이터베이스를 검사해 받아올 점수
         static int GSBScore; //GSB에서 받아올 점수
         // 근데 왜 쓰레드는 리턴형이 무조건 void인지.. C# 이건 좀 짜증남
-        static String cacheBaseName = Path.GetTempFileName();
+
         public static int GetSiteInfo(String Url)
         {
             /*
@@ -37,16 +37,15 @@ namespace Site_Blocker
             int score = 0;
             DBScore = 0;
             GSBScore = 0;
-            //T1_Start = false;
-            T2_Start = false;
+            T1_Start = true;
+            T2_Start = true;
             try
             {
-                //T1 = new Thread(new ParameterizedThreadStart(GetFromDB));
-                //T1.Start(Url);
+                T1 = new Thread(new ParameterizedThreadStart(GetFromDB));
+                T1.Start(Url);
                 T2 = new Thread(new ParameterizedThreadStart(GetFromGSB));
                 T2.Start(Url);
-                //if (!T1_Start && !T2_Start) { }
-                if (!T2_Start) { }
+                while(T1_Start && T2_Start) { }
             }
             catch (Exception e)
             {
